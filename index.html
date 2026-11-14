@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TD N°1 : Logique Combinatoire & Langage VHDL (Exercices 6 & 7) | USTHB - Master FGE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans, Space Grotesk, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        pixel: {
+                            bg: '#060913',
+                            card: '#0D1326',
+                            blue: '#4285F4',
+                            cyan: '#00E5FF',
+                            violet: '#A142F4',
+                            indigo: '#6366F1',
+                            amber: '#F59E0B',
+                            emerald: '#10B981',
+                            rose: '#F43F5E'
+                        }
+                    },
+                    boxShadow: {
+                        'glow-blue': '0 0 25px -5px rgba(66, 133, 244, 0.45)',
+                        'glow-cyan': '0 0 25px -5px rgba(0, 229, 255, 0.45)',
+                        'glow-violet': '0 0 25px -5px rgba(161, 66, 244, 0.45)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Pixel & Space Aesthetics */
+        body {
+            background-color: #060913;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Pixel Grid Overlay */
+        .bg-pixel-grid {
+            background-size: 28px 28px;
+            background-image: 
+                linear-gradient(to right, rgba(66, 133, 244, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(161, 66, 244, 0.06) 1px, transparent 1px);
+        }
+
+        /* Glassmorphic Cards */
+        .glass-card {
+            background: rgba(13, 19, 38, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(66, 133, 244, 0.22);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 229, 255, 0.4);
+        }
+
+        .glass-card-violet {
+            background: rgba(16, 14, 38, 0.78);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(161, 66, 244, 0.25);
+        }
+
+        /* Gradient Text */
+        .text-gradient-pixel {
+            background: linear-gradient(135deg, #4285F4 0%, #00E5FF 50%, #A142F4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Pixel Corner Accents */
+        .pixel-corner {
+            position: relative;
+        }
+        .pixel-corner::before,
+        .pixel-corner::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            pointer-events: none;
+        }
+        .pixel-corner::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid #00E5FF;
+            border-left: 2px solid #00E5FF;
+        }
+        .pixel-corner::after {
+            bottom: -1px;
+            right: -1px;
+            border-bottom: 2px solid #A142F4;
+            border-right: 2px solid #A142F4;
+        }
+
+        /* VHDL Code Syntax Highlighting */
+        .vhdl-kw { color: #A142F4; font-weight: 600; }     /* Keywords: library, entity, process, case, when */
+        .vhdl-type { color: #00E5FF; font-weight: 500; }   /* Types: std_logic, std_logic_vector */
+        .vhdl-str { color: #34D399; font-weight: 600; }    /* Literals: '0', '1', "00" */
+        .vhdl-com { color: #64748B; font-style: italic; }  /* Comments */
+        .vhdl-op { color: #60A5FA; font-weight: 600; }     /* Operators: <=, :=, =>, xor */
+        .vhdl-ent { color: #FBBF24; font-weight: 600; }    /* Entities/Identifiers */
+
+        /* Notation Barre d'inversion logique (Complément / NOT) */
+        .bar {
+            text-decoration: overline;
+            text-decoration-thickness: 1.5px;
+            display: inline-block;
+            padding-top: 1px;
+        }
+
+        /* Animated Signal Lines in SVG */
+        .wire-active {
+            stroke-dasharray: 8 4;
+            animation: flowSignal 0.9s linear infinite;
+        }
+        @keyframes flowSignal {
+            to {
+                stroke-dashoffset: -24;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060913;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4285F4;
+        }
+
+        @media print {
+            #starfield, .no-print { display: none !important; }
+            body { background: #ffffff !important; color: #000000 !important; }
+            .glass-card, .glass-card-violet { background: #ffffff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-pixel-grid min-h-screen relative selection:bg-pixel-blue selection:text-white">
+
+    <!-- Starfield Background Canvas -->
+    <canvas id="starfield" class="fixed inset-0 pointer-events-none z-0 opacity-65"></canvas>
+
+    <!-- Ambient Glow Orbs -->
+    <div class="fixed top-[-10%] left-[-10%] w-[420px] h-[420px] rounded-full bg-pixel-blue/15 blur-[130px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-pixel-violet/15 blur-[140px] pointer-events-none z-0"></div>
+
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#060913]/85 border-b border-pixel-blue/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pixel-blue via-pixel-cyan to-pixel-violet p-[1.5px] shadow-glow-blue">
+                    <div class="w-full h-full bg-[#060913] rounded-[10px] flex items-center justify-center">
+                        <i class="ph-fill ph-cpu text-xl text-pixel-cyan"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-display font-bold text-sm sm:text-base tracking-tight text-white">USTHB • Master FGE — TD N°1 VHDL</span>
+                        <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-pixel-blue/15 text-pixel-cyan border border-pixel-blue/30">
+                            IEEE 1164
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-mono">Dahane Ahmed Lamine — Exercices 6 &amp; 7</p>
+                </div>
+            </div>
+
+            <!-- Quick Jump Buttons -->
+            <nav class="flex items-center gap-2 no-print">
+                <a href="#exercice-6" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-pixel-blue/15 hover:bg-pixel-blue/25 text-pixel-cyan border border-pixel-blue/30 transition flex items-center gap-1.5">
+                    <i class="ph-bold ph-code-block"></i>
+                    <span>Exercice 6 (<code class="font-mono text-xs">C2_3</code>)</span>
+                </a>
+                <a href="#exercice-7" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-pixel-violet/15 hover:bg-pixel-violet/25 text-purple-300 border border-pixel-violet/30 transition flex items-center gap-1.5">
+                    <i class="ph-bold ph-circuitry"></i>
+                    <span>Exercice 7 (<code class="font-mono text-xs">C2_4</code>)</span>
+                </a>
+                <button onclick="window.print()" title="Imprimer / Exporter en PDF" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                    <i class="ph-bold ph-printer text-base"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16">
+
+        <!-- HERO HEADER -->
+        <section class="relative rounded-3xl glass-card p-6 sm:p-10 overflow-hidden pixel-corner shadow-glow-blue">
+            <div class="absolute -right-16 -top-16 w-72 h-72 bg-gradient-to-br from-pixel-blue/20 via-pixel-cyan/10 to-pixel-violet/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Academic Institution Banner -->
+            <div class="mb-6 pb-4 border-b border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-slate-300">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-buildings text-pixel-cyan text-base"></i>
+                    <span class="font-semibold tracking-wide text-white">UNIVERSITÉ DES SCIENCES ET DE LA TECHNOLOGIE HOUARI BOUMEDIENE (USTHB)</span>
+                </div>
+                <div class="text-pixel-cyan font-semibold">
+                    Faculté de Génie Électrique • Master FGE
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div class="space-y-4 max-w-3xl">
+                    <!-- Author & Module Badges -->
+                    <div class="inline-flex flex-wrap items-center gap-2.5">
+                        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold bg-gradient-to-r from-pixel-blue/20 via-pixel-cyan/15 to-pixel-violet/20 text-pixel-cyan border border-pixel-cyan/40 shadow-glow-cyan">
+                            <i class="ph-fill ph-student text-pixel-cyan text-sm"></i>
+                            Réalisé par : Dahane Ahmed Lamine
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono bg-slate-800/90 text-purple-300 border border-pixel-violet/30">
+                            <i class="ph-bold ph-notebook text-pixel-violet"></i>
+                            Travaux Dirigés N°1 — Systèmes Logiques &amp; VHDL
+                        </span>
+                    </div>
+
+                    <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                        TD N°1 : Logique Combinatoire &amp; Langage VHDL <span class="text-gradient-pixel">(Exercices 6 &amp; 7)</span>
+                    </h1>
+
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Dans ce travail, je présente ma résolution détaillée des exercices <strong>6</strong> (Entité <code class="font-mono text-pixel-cyan">C2_3</code> utilisant l'instruction séquentielle <code class="font-mono text-purple-300">case ... when</code>) et <strong>7</strong> (Entité <code class="font-mono text-pixel-cyan">C2_4</code> réalisant une porte <code class="font-mono text-purple-300">XOR</code> à 3 entrées). J'ai détaillé chaque étape de mon raisonnement : équations algébriques avec barres d'inversion (<span class="bar font-mono text-pixel-cyan">x<sub>0</sub></span>, <span class="bar font-mono text-pixel-cyan">x<sub>1</sub></span>), rôle du <code class="font-mono text-purple-300">process</code>, prise en compte des 9 états du type <code class="font-mono text-pixel-cyan">std_logic</code> et vérification par simulation interactive.
+                    </p>
+                </div>
+
+                <!-- Summary Stats / Architecture Cards -->
+                <div class="grid grid-cols-2 gap-3 sm:w-80 shrink-0">
+                    <div class="p-4 rounded-2xl bg-slate-900/90 border border-pixel-blue/30 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono uppercase text-slate-400">Exercice 06</span>
+                            <i class="ph-duotone ph-git-branch text-lg text-pixel-cyan"></i>
+                        </div>
+                        <div class="mt-2">
+                            <div class="font-display font-bold text-xl text-white">C2_3 / A2_3</div>
+                            <p class="text-[11px] font-mono text-pixel-cyan mt-0.5">Process + case when</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-900/90 border border-pixel-violet/30 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono uppercase text-slate-400">Exercice 07</span>
+                            <i class="ph-duotone ph-intersect text-lg text-pixel-violet"></i>
+                        </div>
+                        <div class="mt-2">
+                            <div class="font-display font-bold text-xl text-white">C2_4 / A2_4</div>
+                            <p class="text-[11px] font-mono text-purple-300 mt-0.5">Porte XOR 3 entrées</p>
+                        </div>
+                    </div>
+                    <div class="col-span-2 p-3.5 rounded-2xl bg-gradient-to-r from-pixel-blue/10 via-slate-900 to-pixel-violet/10 border border-slate-700/80 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-xs font-mono text-slate-300">Banc de Test &amp; Simulation</span>
+                        </div>
+                        <span class="text-[11px] font-mono text-pixel-cyan">Temps Réel</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             SECTION 1 : EXERCICE 6 (Entité C2_3 & Architecture A2_3)
+        ====================================================================== -->
+        <section id="exercice-6" class="scroll-mt-20 space-y-8">
+            <!-- Section Banner -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-pixel-blue/30">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-pixel-blue/20 border border-pixel-blue/50 flex items-center justify-center shadow-glow-blue">
+                        <span class="font-display font-bold text-xl text-pixel-cyan">06</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono uppercase tracking-wider text-pixel-cyan">TD N°1 • Exercice 6</span>
+                            <span class="px-2 py-0.5 text-[11px] font-mono rounded bg-pixel-blue/20 text-blue-300 border border-pixel-blue/30">Description Séquentielle</span>
+                        </div>
+                        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">
+                            Exercice 6 : Entité <code class="text-pixel-cyan font-mono">C2_3</code> &amp; Instruction <code class="text-purple-400 font-mono">case ... when</code>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. Énoncé Officiel + Table de Vérité du TD -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Énoncé Card -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                            <i class="ph-fill ph-book-open-text text-pixel-cyan"></i>
+                            1. Rappel de l'Énoncé
+                        </h3>
+                        <span class="text-xs font-mono text-slate-400">Données de l'exercice</span>
+                    </div>
+
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Écrire le code VHDL, l'entité et l'architecture selon la description suivante :
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Nom de l'entité :</span>
+                            <span class="text-amber-400 font-bold text-sm">C2_3</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Architecture :</span>
+                            <span class="text-pixel-cyan font-bold text-sm">A2_3</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Signaux d'entrée :</span>
+                            <span class="text-purple-300 font-bold">x0, x1 (std_logic)</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Signal de sortie :</span>
+                            <span class="text-emerald-400 font-bold">z (std_logic)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-pixel-blue/10 border border-pixel-blue/30 text-sm text-slate-200 leading-relaxed space-y-2">
+                        <div class="font-semibold text-pixel-cyan flex items-center gap-1.5">
+                            <i class="ph-bold ph-check-square-offset"></i>
+                            Fonctionnement demandé :
+                        </div>
+                        <p>
+                            En utilisant <code class="px-1.5 py-0.5 rounded bg-slate-900 font-mono text-purple-300 border border-purple-500/30">case when</code>, le signal de sortie <code class="font-mono text-emerald-300">z</code> doit être assigné selon la table de vérité ci-contre.
+                            <strong class="text-white underline decoration-pixel-cyan/60 underline-offset-4">Tous les états non spécifiés</strong> des signaux d'entrée doivent donner lieu à l'assignation de la valeur zéro (<code class="font-mono text-rose-300">'0'</code>) au signal de sortie <code class="font-mono text-emerald-300">z</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Table de Vérité Officielle + Équation Booléenne avec Barre -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="font-display font-bold text-lg text-white flex items-center gap-2 mb-3">
+                            <i class="ph-fill ph-table text-pixel-violet"></i>
+                            Table de Vérité de l'Énoncé
+                        </h3>
+                        <div class="overflow-hidden rounded-xl border border-slate-700/80">
+                            <table class="w-full text-center font-mono text-sm">
+                                <thead class="bg-slate-900/95 text-xs uppercase text-slate-400 border-b border-slate-700">
+                                    <tr>
+                                        <th class="py-2.5 px-3">x<sub>0</sub></th>
+                                        <th class="py-2.5 px-3">x<sub>1</sub></th>
+                                        <th class="py-2.5 px-3">Mot "x<sub>0</sub>&amp;x<sub>1</sub>"</th>
+                                        <th class="py-2.5 px-3 text-pixel-cyan">Sortie Z</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/80 bg-slate-950/50">
+                                    <tr class="hover:bg-pixel-blue/10 transition">
+                                        <td class="py-2 font-bold text-slate-300">'0'</td>
+                                        <td class="py-2 font-bold text-slate-300">'0'</td>
+                                        <td class="py-2 text-xs text-slate-400">"00"</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr class="bg-rose-950/20 hover:bg-rose-900/20 transition">
+                                        <td class="py-2 font-bold text-slate-300">'0'</td>
+                                        <td class="py-2 font-bold text-slate-300">'1'</td>
+                                        <td class="py-2 text-xs text-slate-400">"01"</td>
+                                        <td class="py-2 font-bold text-rose-400">'0'</td>
+                                    </tr>
+                                    <tr class="hover:bg-pixel-blue/10 transition">
+                                        <td class="py-2 font-bold text-slate-300">'1'</td>
+                                        <td class="py-2 font-bold text-slate-300">'1'</td>
+                                        <td class="py-2 text-xs text-slate-400">"10"</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr class="hover:bg-pixel-blue/10 transition">
+                                        <td class="py-2 font-bold text-slate-300">'1'</td>
+                                        <td class="py-2 font-bold text-slate-300">'1'</td>
+                                        <td class="py-2 text-xs text-slate-400">"11"</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr class="bg-amber-950/20 text-amber-300/90 text-xs">
+                                        <td colspan="3" class="py-2 px-3 text-left font-sans">
+                                            <i class="ph-bold ph-warning-circle mr-1"></i>États non spécifiés ('U', 'X', 'Z', 'W', 'L', 'H', '-')
+                                        </td>
+                                        <td class="py-2 font-bold text-rose-400 font-mono text-sm">'0'</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Mini Boolean Insight with Overline Bar -->
+                    <div class="p-3.5 rounded-xl bg-slate-900/90 border border-pixel-violet/30 text-xs space-y-1.5">
+                        <div class="font-semibold text-purple-300 flex items-center gap-1.5">
+                            <i class="ph-bold ph-function"></i>
+                            Vérification Algébrique (Équation avec barre) :
+                        </div>
+                        <p class="text-slate-300 font-mono leading-relaxed">
+                            • Somme des mintermes : Z = (<span class="bar">x<sub>0</sub></span> · <span class="bar">x<sub>1</sub></span>) + (x<sub>0</sub> · <span class="bar">x<sub>1</sub></span>) + (x<sub>0</sub> · x<sub>1</sub>)<br>
+                            • Par De Morgan sur l'unique zéro (<span class="bar">Z</span> = <span class="bar">x<sub>0</sub></span> · x<sub>1</sub>) : <span class="text-pixel-cyan font-bold">Z = x<sub>0</sub> + <span class="bar">x<sub>1</sub></span></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Démarche et Compréhension Étudiante -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase text-pixel-cyan tracking-wider">Ma Démarche de Résolution</span>
+                        <h3 class="font-display text-xl font-bold text-white mt-0.5">
+                            2. Explications &amp; Justification de mes Choix en VHDL
+                        </h3>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-mono bg-pixel-violet/20 text-purple-300 border border-pixel-violet/40 self-start sm:self-center">
+                        Analyse Personnelle Détaillée
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Étape 1 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/75 border border-slate-800 hover:border-pixel-blue/50 transition space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-pixel-blue/20 border border-pixel-blue/40 text-pixel-cyan font-mono text-xs font-bold flex items-center justify-center">01</span>
+                            <h4 class="font-display font-bold text-base text-white">Pourquoi ai-je utilisé un <code class="font-mono text-pixel-cyan">process(x0, x1)</code> ?</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Dans les exercices 2 et 3 du TD, on utilisait <code class="font-mono text-pixel-cyan">with ... select</code> et <code class="font-mono text-pixel-cyan">when ... else</code> qui sont des instructions <strong>concurrentes</strong> (elles s'écrivent directement dans l'architecture). Ici, l'énoncé impose d'utiliser <code class="font-mono text-purple-300">case ... when</code>. Or, en VHDL, <code class="font-mono text-purple-300">case</code> est une instruction <strong>strictement séquentielle</strong>.
+                        </p>
+                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300">
+                            <span class="text-emerald-400">→ Ma solution :</span> J'ouvre un bloc <code class="text-purple-300">process(x0, x1)</code> en mettant bien <code class="text-pixel-cyan">x0</code> et <code class="text-pixel-cyan">x1</code> dans la liste de sensibilité pour que la sortie <code class="text-emerald-400">z</code> soit recalculée dès qu'une entrée change.
+                        </div>
+                    </div>
+
+                    <!-- Étape 2 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/75 border border-slate-800 hover:border-pixel-blue/50 transition space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-pixel-cyan/20 border border-pixel-cyan/40 text-pixel-cyan font-mono text-xs font-bold flex items-center justify-center">02</span>
+                            <h4 class="font-display font-bold text-base text-white">Astuce de concaténation (<code class="font-mono text-pixel-cyan">x0 &amp; x1</code>)</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Au lieu d'imbriquer deux <code class="font-mono text-purple-300">case</code> l'un dans l'autre (un pour <code class="font-mono text-pixel-cyan">x0</code> puis un pour <code class="font-mono text-pixel-cyan">x1</code>, ce qui alourdit le code), j'ai choisi de regrouper les deux signaux en un seul vecteur de 2 bits grâce à l'opérateur de concaténation <code class="font-mono text-amber-300">&amp;</code>.
+                        </p>
+                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300">
+                            <span class="text-amber-400">→ Précaution de compilation :</span> J'ai déclaré une variable locale <code class="text-pixel-cyan">sel : std_logic_vector(1 downto 0);</code> affectée par <code class="text-purple-300">sel := x0 &amp; x1;</code> pour que le compilateur VHDL connaisse exactement les bornes du vecteur testé.
+                        </div>
+                    </div>
+
+                    <!-- Étape 2 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/75 border border-slate-800 hover:border-pixel-blue/50 transition space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-pixel-cyan/20 border border-pixel-cyan/40 text-pixel-cyan font-mono text-xs font-bold flex items-center justify-center">02</span>
+                            <h4 class="font-display font-bold text-base text-white">Astuce de concaténation (<code class="font-mono text-pixel-cyan">x0 &amp; x1</code>)</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Au lieu d'imbriquer deux <code class="font-mono text-purple-300">case</code> l'un dans l'autre (un pour <code class="font-mono text-pixel-cyan">x0</code> puis un pour <code class="font-mono text-pixel-cyan">x1</code>, ce qui alourdit le code), nous avons regroupé les deux signaux en un seul vecteur de 2 bits grâce à l'opérateur de concaténation <code class="font-mono text-amber-300">&amp;</code>.
+                        </p>
+                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300">
+                            <span class="text-amber-400">→ Précaution de compilation :</span> Nous avons déclaré une variable locale <code class="text-pixel-cyan">sel : std_logic_vector(1 downto 0);</code> affectée par <code class="text-purple-300">sel := x0 &amp; x1;</code> pour que le compilateur VHDL connaisse exactement les bornes du vecteur testé.
+                        </div>
+                    </div>
+
+                    <!-- Étape 3 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/75 border border-slate-800 hover:border-pixel-violet/50 transition space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-pixel-violet/20 border border-pixel-violet/40 text-purple-300 font-mono text-xs font-bold flex items-center justify-center">03</span>
+                            <h4 class="font-display font-bold text-base text-white">Pourquoi <code class="font-mono text-purple-300">when others =&gt; z &lt;= '0';</code> est indispensable ?</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Les entrées <code class="font-mono text-pixel-cyan">x0</code> et <code class="font-mono text-pixel-cyan">x1</code> ne sont pas de type <code class="font-mono">bit</code> (qui n'a que <code class="font-mono">'0'</code> et <code class="font-mono">'1'</code>), mais de type <code class="font-mono text-pixel-cyan">std_logic</code> (norme IEEE 1164) qui possède <strong>9 états</strong> : <code class="font-mono text-amber-300">'U', 'X', '0', '1', 'Z', 'W', 'L', 'H', '-'</code>.
+                        </p>
+                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300">
+                            Avec 2 entrées à 9 états, il y a <strong class="text-pixel-cyan">9 × 9 = 81 cas possibles</strong>. La table n'en spécifie que 4 (<code class="text-emerald-300">"00", "01", "10", "11"</code>). La ligne <code class="text-purple-300">when others =&gt; z &lt;= '0';</code> traite d'un seul coup les <strong>77 états non spécifiés restants</strong> comme exigé par l'énoncé.
+                        </div>
+                    </div>
+
+                    <!-- Étape 4 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/75 border border-slate-800 hover:border-pixel-violet/50 transition space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center">04</span>
+                            <h4 class="font-display font-bold text-base text-white">Simplification Booléenne avec Barres d'Inversion</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            En observant la table de vérité, on remarque que <code class="font-mono text-emerald-400">Z = '1'</code> pour trois lignes et <code class="font-mono text-rose-400">Z = '0'</code> pour une seule ligne (<code class="font-mono">x<sub>0</sub> = 0</code> et <code class="font-mono">x<sub>1</sub> = 1</code>) :
+                        </p>
+                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300 space-y-1">
+                            <div><span class="bar">Z</span> = <span class="bar">x<sub>0</sub></span> · x<sub>1</sub></div>
+                            <div>⇒ Z = <span class="bar"><span class="bar">x<sub>0</sub></span> · x<sub>1</sub></span> = <span class="text-pixel-cyan font-bold">x<sub>0</sub> + <span class="bar">x<sub>1</sub></span></span> (Théorème de De Morgan)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Simulateur Interactif Temps Réel (Exercice 6) -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border-pixel-cyan/30 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-pixel-cyan animate-ping"></span>
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-white">
+                                3. Simulateur Interactif de l'Entité <code class="font-mono text-pixel-cyan">C2_3</code> (Test des 9 États IEEE 1164)
+                            </h3>
+                            <p class="text-xs text-slate-400">
+                                Cliquez sur les valeurs de <code class="font-mono text-pixel-cyan">x0</code> et <code class="font-mono text-pixel-cyan">x1</code> (y compris les états non spécifiés <code class="font-mono text-amber-400">'U'</code>, <code class="font-mono text-amber-400">'Z'</code>, <code class="font-mono text-amber-400">'X'</code>) pour observer quelle branche du <code class="font-mono text-purple-300">case ... when</code> s'exécute.
+                            </p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 font-mono text-xs text-pixel-cyan self-start sm:self-center">
+                        Vecteur actuel : sel = "<span id="ex6-sel-badge" class="font-bold text-white">00</span>"
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Contrôles d'entrées X0 et X1 -->
+                    <div class="lg:col-span-4 space-y-4">
+                        <!-- Sélecteur X0 -->
+                        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs font-bold text-slate-300">Signal d'entrée <code class="text-pixel-cyan text-sm">x0</code> :</span>
+                                <span id="ex6-x0-desc" class="text-[11px] font-mono text-emerald-400">Niveau Bas ('0')</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1.5" id="ex6-x0-btns">
+                                <button onclick="setEx6Input('0', null)" data-val="0" class="ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-pixel-blue text-white border-pixel-cyan shadow-glow-blue">'0'</button>
+                                <button onclick="setEx6Input('1', null)" data-val="1" class="ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-slate-300 border-slate-700 hover:border-pixel-blue">'1'</button>
+                                <button onclick="setEx6Input('U', null)" data-val="U" class="ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Non initialisé">'U'</button>
+                                <button onclick="setEx6Input('Z', null)" data-val="Z" class="ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Haute Impédance">'Z'</button>
+                                <button onclick="setEx6Input('X', null)" data-val="X" class="ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Inconnu Forcé">'X'</button>
+                            </div>
+                        </div>
+
+                        <!-- Sélecteur X1 -->
+                        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs font-bold text-slate-300">Signal d'entrée <code class="text-pixel-cyan text-sm">x1</code> :</span>
+                                <span id="ex6-x1-desc" class="text-[11px] font-mono text-emerald-400">Niveau Bas ('0')</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1.5" id="ex6-x1-btns">
+                                <button onclick="setEx6Input(null, '0')" data-val="0" class="ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-pixel-blue text-white border-pixel-cyan shadow-glow-blue">'0'</button>
+                                <button onclick="setEx6Input(null, '1')" data-val="1" class="ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-slate-300 border-slate-700 hover:border-pixel-blue">'1'</button>
+                                <button onclick="setEx6Input(null, 'U')" data-val="U" class="ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Non initialisé">'U'</button>
+                                <button onclick="setEx6Input(null, 'Z')" data-val="Z" class="ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Haute Impédance">'Z'</button>
+                                <button onclick="setEx6Input(null, 'X')" data-val="X" class="ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-500" title="Inconnu Forcé">'X'</button>
+                            </div>
+                        </div>
+
+                        <!-- Live Trace Box -->
+                        <div id="ex6-status-box" class="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs font-mono space-y-1">
+                            <div class="text-emerald-300 font-bold flex items-center gap-1.5">
+                                <i class="ph-fill ph-check-circle text-sm"></i>
+                                <span id="ex6-branch-title">Branche active : when "00" =&gt; z &lt;= '1';</span>
+                            </div>
+                            <p id="ex6-branch-explain" class="text-slate-300 font-sans text-xs">
+                                Les deux entrées sont à '0'. Le vecteur "00" correspond au 1er cas de la table de vérité : la sortie z passe à '1'.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Schéma SVG Dynamique de l'Entité C2_3 -->
+                    <div class="lg:col-span-5 bg-slate-950/90 rounded-2xl border border-slate-800 p-4 flex flex-col items-center justify-center">
+                        <span class="text-[11px] font-mono text-slate-400 mb-2">Vue Architecturale RTL — Entité C2_3 (A2_3)</span>
+                        <svg viewBox="0 0 420 230" class="w-full max-w-md h-auto">
+                            <defs>
+                                <linearGradient id="gradEntity6" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#1E293B" />
+                                    <stop offset="100%" stop-color="#0F172A" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Input Wire X0 -->
+                            <line id="svg-ex6-wire-x0" x1="35" y1="70" x2="125" y2="70" stroke="#4285F4" stroke-width="4" stroke-linecap="round" />
+                            <circle cx="35" cy="70" r="14" fill="#0F172A" stroke="#4285F4" stroke-width="2" />
+                            <text id="svg-ex6-txt-x0" x="35" y="75" text-anchor="middle" fill="#00E5FF" font-family="JetBrains Mono" font-size="13" font-weight="bold">'0'</text>
+                            <text x="65" y="58" fill="#94A3B8" font-family="JetBrains Mono" font-size="11">x0</text>
+
+                            <!-- Input Wire X1 -->
+                            <line id="svg-ex6-wire-x1" x1="35" y1="160" x2="125" y2="160" stroke="#4285F4" stroke-width="4" stroke-linecap="round" />
+                            <circle cx="35" cy="160" r="14" fill="#0F172A" stroke="#4285F4" stroke-width="2" />
+                            <text id="svg-ex6-txt-x1" x="35" y="165" text-anchor="middle" fill="#00E5FF" font-family="JetBrains Mono" font-size="13" font-weight="bold">'0'</text>
+                            <text x="65" y="148" fill="#94A3B8" font-family="JetBrains Mono" font-size="11">x1</text>
+
+                            <!-- Entity Box C2_3 -->
+                            <rect x="125" y="25" width="175" height="180" rx="14" fill="url(#gradEntity6)" stroke="#4285F4" stroke-width="2" />
+                            <text x="212" y="48" text-anchor="middle" fill="#FBBF24" font-family="Space Grotesk" font-size="13" font-weight="bold">ENTITY C2_3</text>
+                            <text x="212" y="64" text-anchor="middle" fill="#94A3B8" font-family="JetBrains Mono" font-size="10">process(x0, x1)</text>
+
+                            <!-- Internal Case Box -->
+                            <rect x="143" y="78" width="139" height="108" rx="8" fill="#060913" stroke="#A142F4" stroke-width="1.5" />
+                            <text x="212" y="96" text-anchor="middle" fill="#C084FC" font-family="JetBrains Mono" font-size="10" font-weight="bold">case (x0 &amp; x1) is</text>
+                            <text id="svg-ex6-case-00" x="155" y="115" fill="#34D399" font-family="JetBrains Mono" font-size="10" font-weight="bold">&gt; "00" =&gt; z &lt;= '1'</text>
+                            <text id="svg-ex6-case-01" x="155" y="131" fill="#64748B" font-family="JetBrains Mono" font-size="10">  "01" =&gt; z &lt;= '0'</text>
+                            <text id="svg-ex6-case-10" x="155" y="147" fill="#64748B" font-family="JetBrains Mono" font-size="10">  "10" =&gt; z &lt;= '1'</text>
+                            <text id="svg-ex6-case-11" x="155" y="163" fill="#64748B" font-family="JetBrains Mono" font-size="10">  "11" =&gt; z &lt;= '1'</text>
+                            <text id="svg-ex6-case-others" x="155" y="179" fill="#64748B" font-family="JetBrains Mono" font-size="10">  others =&gt; z &lt;= '0'</text>
+
+                            <!-- Output Wire Z -->
+                            <line id="svg-ex6-wire-z" x1="300" y1="115" x2="375" y2="115" stroke="#00E5FF" stroke-width="4" stroke-linecap="round" class="wire-active" />
+                            <circle id="svg-ex6-node-z" cx="385" cy="115" r="18" fill="#064E3B" stroke="#10B981" stroke-width="2.5" />
+                            <text id="svg-ex6-txt-z" x="385" y="120" text-anchor="middle" fill="#34D399" font-family="JetBrains Mono" font-size="15" font-weight="bold">'1'</text>
+                            <text x="335" y="102" fill="#94A3B8" font-family="JetBrains Mono" font-size="12" font-weight="bold">z</text>
+                        </svg>
+                    </div>
+
+                    <!-- Mini Table de Vérité Interactive -->
+                    <div class="lg:col-span-3">
+                        <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-950/70">
+                            <div class="px-3 py-2 bg-slate-900 text-[11px] font-mono text-slate-400 border-b border-slate-800 flex justify-between">
+                                <span>Table en direct</span>
+                                <span>Cliquez une ligne</span>
+                            </div>
+                            <table class="w-full font-mono text-xs text-center">
+                                <thead class="bg-slate-900/50 text-slate-400">
+                                    <tr>
+                                        <th class="py-1.5">x0</th>
+                                        <th class="py-1.5">x1</th>
+                                        <th class="py-1.5">z</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60">
+                                    <tr id="ex6-row-00" onclick="setEx6Input('0','0')" class="cursor-pointer bg-pixel-blue/25 text-white font-bold transition">
+                                        <td class="py-2">'0'</td>
+                                        <td class="py-2">'0'</td>
+                                        <td class="py-2 text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex6-row-01" onclick="setEx6Input('0','1')" class="cursor-pointer hover:bg-slate-900 text-slate-400 transition">
+                                        <td class="py-2">'0'</td>
+                                        <td class="py-2">'1'</td>
+                                        <td class="py-2 text-rose-400">'0'</td>
+                                    </tr>
+                                    <tr id="ex6-row-10" onclick="setEx6Input('1','0')" class="cursor-pointer hover:bg-slate-900 text-slate-400 transition">
+                                        <td class="py-2">'1'</td>
+                                        <td class="py-2">'0'</td>
+                                        <td class="py-2 text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex6-row-11" onclick="setEx6Input('1','1')" class="cursor-pointer hover:bg-slate-900 text-slate-400 transition">
+                                        <td class="py-2">'1'</td>
+                                        <td class="py-2">'1'</td>
+                                        <td class="py-2 text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex6-row-others" onclick="setEx6Input('U','1')" class="cursor-pointer hover:bg-slate-900 text-slate-400 transition">
+                                        <td colspan="2" class="py-2 text-amber-400">others ('U','Z'...)</td>
+                                        <td class="py-2 text-rose-400">'0'</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Code VHDL Complet & Commenté (Exercice 6) -->
+            <div class="glass-card rounded-2xl overflow-hidden border border-pixel-blue/40 shadow-glow-blue">
+                <!-- Code Header & Tabs -->
+                <div class="bg-slate-900/95 px-4 sm:px-6 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span class="font-mono text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                            <i class="ph-fill ph-file-code text-pixel-cyan"></i>
+                            C2_3.vhd — Solution VHDL Complète (Exercice 6)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 no-print">
+                        <button onclick="switchEx6Tab('explicit')" id="btn-ex6-explicit" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-blue text-white transition">
+                            Méthode 1 : Explicite (Recommandée TD)
+                        </button>
+                        <button onclick="switchEx6Tab('compact')" id="btn-ex6-compact" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                            Méthode 2 : Regroupée (Optimisée)
+                        </button>
+                        <button onclick="copyVHDL('code-ex6-active')" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition">
+                            <i class="ph-bold ph-copy"></i>
+                            <span>Copier</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Block 1: Explicit Academic Standard -->
+                <div id="panel-ex6-explicit" class="p-5 sm:p-6 bg-[#070B16] overflow-x-auto">
+<pre id="code-ex6-explicit" class="font-mono text-xs sm:text-sm leading-relaxed text-slate-200"><span class="vhdl-com">-- ============================================================================</span>
+<span class="vhdl-com">-- USTHB - Faculté de Génie Électrique (Master FGE)</span>
+<span class="vhdl-com">-- TD N°1 : Exercice 6 (Entité C2_3 / Architecture A2_3)</span>
+<span class="vhdl-com">-- Réalisé par : Dahane Ahmed Lamine</span>
+<span class="vhdl-com">-- ============================================================================</span>
+
+<span class="vhdl-com">-- Je déclare la bibliothèque IEEE et le paquetage std_logic_1164</span>
+<span class="vhdl-com">-- afin de pouvoir utiliser le type à 9 états "std_logic" demandé dans l'énoncé.</span>
+<span class="vhdl-kw">library</span> IEEE;
+<span class="vhdl-kw">use</span> IEEE.std_logic_1164.<span class="vhdl-kw">all</span>;
+
+<span class="vhdl-com">-- Déclaration de l'entité C2_3 avec ses deux entrées x0, x1 et sa sortie z</span>
+<span class="vhdl-kw">entity</span> <span class="vhdl-ent">C2_3</span> <span class="vhdl-kw">is</span>
+    <span class="vhdl-kw">port</span> (
+        x0, x1 : <span class="vhdl-kw">in</span>  <span class="vhdl-type">std_logic</span>;  <span class="vhdl-com">-- Signaux d'entrée de type std_logic</span>
+        z      : <span class="vhdl-kw">out</span> <span class="vhdl-type">std_logic</span>   <span class="vhdl-com">-- Signal de sortie de type std_logic</span>
+    );
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">C2_3</span>;
+
+<span class="vhdl-com">-- Déclaration de l'architecture A2_3 associée à l'entité C2_3</span>
+<span class="vhdl-kw">architecture</span> <span class="vhdl-ent">A2_3</span> <span class="vhdl-kw">of</span> <span class="vhdl-ent">C2_3</span> <span class="vhdl-kw">is</span>
+<span class="vhdl-kw">begin</span>
+
+    <span class="vhdl-com">-- Attention : comme l'instruction "case ... when" est séquentielle,</span>
+    <span class="vhdl-com">-- je dois obligatoirement la placer à l'intérieur d'un process.</span>
+    <span class="vhdl-com">-- Je mets x0 et x1 dans la liste de sensibilité pour réévaluer z à chaque changement.</span>
+    <span class="vhdl-kw">process</span>(x0, x1)
+        <span class="vhdl-com">-- Astuce : je déclare une variable locale de 2 bits pour regrouper x0 et x1</span>
+        <span class="vhdl-com">-- et tester directement les 4 lignes de la table de vérité.</span>
+        <span class="vhdl-kw">variable</span> sel : <span class="vhdl-type">std_logic_vector</span>(1 <span class="vhdl-kw">downto</span> 0);
+    <span class="vhdl-kw">begin</span>
+        <span class="vhdl-com">-- Je concatène x0 et x1 avec l'opérateur '&amp;' (affectation immédiate ':=' car c'est une variable)</span>
+        sel <span class="vhdl-op">:=</span> x0 <span class="vhdl-op">&amp;</span> x1;
+
+        <span class="vhdl-com">-- Test des combinaisons selon la table de vérité de l'exercice</span>
+        <span class="vhdl-kw">case</span> sel <span class="vhdl-kw">is</span>
+            <span class="vhdl-kw">when</span> <span class="vhdl-str">"00"</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'1'</span>;  <span class="vhdl-com">-- 1ère ligne : x0 = '0' et x1 = '0' ==&gt; z = '1'</span>
+
+            <span class="vhdl-kw">when</span> <span class="vhdl-str">"01"</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'0'</span>;  <span class="vhdl-com">-- 2ème ligne : x0 = '0' et x1 = '1' ==&gt; z = '0'</span>
+
+            <span class="vhdl-kw">when</span> <span class="vhdl-str">"10"</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'1'</span>;  <span class="vhdl-com">-- 3ème ligne : x0 = '1' et x1 = '0' ==&gt; z = '1'</span>
+
+            <span class="vhdl-kw">when</span> <span class="vhdl-str">"11"</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'1'</span>;  <span class="vhdl-com">-- 4ème ligne : x0 = '1' et x1 = '1' ==&gt; z = '1'</span>
+
+            <span class="vhdl-com">-- Je n'oublie surtout pas "when others" demandé par l'énoncé :</span>
+            <span class="vhdl-com">-- si x0 ou x1 prend un état non spécifié ('U', 'X', 'Z', 'W', 'L', 'H', '-'),</span>
+            <span class="vhdl-com">-- la sortie z est immédiatement forcée à '0'.</span>
+            <span class="vhdl-kw">when</span> <span class="vhdl-kw">others</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'0'</span>;
+        <span class="vhdl-kw">end</span> <span class="vhdl-kw">case</span>;
+    <span class="vhdl-kw">end</span> <span class="vhdl-kw">process</span>;
+
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">A2_3</span>;</pre>
+                </div>
+
+                <!-- Code Block 2: Compact Version with Pipe | -->
+                <div id="panel-ex6-compact" class="hidden p-5 sm:p-6 bg-[#070B16] overflow-x-auto">
+<pre id="code-ex6-compact" class="font-mono text-xs sm:text-sm leading-relaxed text-slate-200"><span class="vhdl-com">-- ============================================================================</span>
+<span class="vhdl-com">-- USTHB - Master FGE | TD N°1 : Exercice 6 (Seconde écriture plus compacte)</span>
+<span class="vhdl-com">-- Réalisé par : Dahane Ahmed Lamine</span>
+<span class="vhdl-com">-- Idée : Je regroupe les cas où z = '1' avec la barre de choix '|'</span>
+<span class="vhdl-com">-- ============================================================================</span>
+
+<span class="vhdl-kw">library</span> IEEE;
+<span class="vhdl-kw">use</span> IEEE.std_logic_1164.<span class="vhdl-kw">all</span>;
+
+<span class="vhdl-kw">entity</span> <span class="vhdl-ent">C2_3</span> <span class="vhdl-kw">is</span>
+    <span class="vhdl-kw">port</span> (
+        x0, x1 : <span class="vhdl-kw">in</span>  <span class="vhdl-type">std_logic</span>;
+        z      : <span class="vhdl-kw">out</span> <span class="vhdl-type">std_logic</span>
+    );
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">C2_3</span>;
+
+<span class="vhdl-kw">architecture</span> <span class="vhdl-ent">A2_3</span> <span class="vhdl-kw">of</span> <span class="vhdl-ent">C2_3</span> <span class="vhdl-kw">is</span>
+<span class="vhdl-kw">begin</span>
+
+    <span class="vhdl-kw">process</span>(x0, x1)
+        <span class="vhdl-kw">variable</span> sel : <span class="vhdl-type">std_logic_vector</span>(1 <span class="vhdl-kw">downto</span> 0);
+    <span class="vhdl-kw">begin</span>
+        sel <span class="vhdl-op">:=</span> x0 <span class="vhdl-op">&amp;</span> x1;
+
+        <span class="vhdl-kw">case</span> sel <span class="vhdl-kw">is</span>
+            <span class="vhdl-com">-- Les trois combinaisons "00", "10" et "11" donnent toutes z = '1'</span>
+            <span class="vhdl-kw">when</span> <span class="vhdl-str">"00"</span> <span class="vhdl-op">|</span> <span class="vhdl-str">"10"</span> <span class="vhdl-op">|</span> <span class="vhdl-str">"11"</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'1'</span>;
+
+            <span class="vhdl-com">-- Tous les autres cas (le cas "01" ainsi que les états non spécifiés) donnent z = '0'</span>
+            <span class="vhdl-kw">when</span> <span class="vhdl-kw">others</span> <span class="vhdl-op">=&gt;</span>
+                z <span class="vhdl-op">&lt;=</span> <span class="vhdl-str">'0'</span>;
+        <span class="vhdl-kw">end</span> <span class="vhdl-kw">case</span>;
+    <span class="vhdl-kw">end</span> <span class="vhdl-kw">process</span>;
+
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">A2_3</span>;</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             SECTION 2 : EXERCICE 7 (Entité C2_4 & Architecture A2_4 - XOR 3 entrées)
+        ====================================================================== -->
+        <section id="exercice-7" class="scroll-mt-20 space-y-8 pt-6">
+            <!-- Section Banner -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-pixel-violet/30">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-pixel-violet/20 border border-pixel-violet/50 flex items-center justify-center shadow-glow-violet">
+                        <span class="font-display font-bold text-xl text-purple-300">07</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono uppercase tracking-wider text-purple-300">TD 1 • Page 2</span>
+                            <span class="px-2 py-0.5 text-[11px] font-mono rounded bg-pixel-violet/20 text-purple-300 border border-pixel-violet/30">Logique Combinatoire & Parité</span>
+                        </div>
+                        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">
+                            Exercice 7 : Entité <code class="text-purple-300 font-mono">C2_4</code> & Porte <code class="text-pixel-cyan font-mono">XOR</code> à 3 Entrées
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. Énoncé Officiel + Propriétés Mathématiques du XOR 3 entrées -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Énoncé Card -->
+                <div class="lg:col-span-6 glass-card-violet rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                            <i class="ph-fill ph-book-open-text text-purple-300"></i>
+                            1. Rappel de l'Énoncé
+                        </h3>
+                        <span class="text-xs font-mono text-slate-400">Données de l'exercice</span>
+                    </div>
+
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Écrire le code VHDL, l'entité et l'architecture selon la description suivante :
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Nom de l'entité :</span>
+                            <span class="text-amber-400 font-bold text-sm">C2_4</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Architecture :</span>
+                            <span class="text-purple-300 font-bold text-sm">A2_4</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Signaux d'entrée :</span>
+                            <span class="text-pixel-cyan font-bold">x0, x1, x2 (std_logic)</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400">Signal de sortie :</span>
+                            <span class="text-emerald-400 font-bold">z (std_logic)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-pixel-violet/15 border border-pixel-violet/35 text-sm text-slate-200 leading-relaxed space-y-2">
+                        <div class="font-semibold text-purple-300 flex items-center gap-1.5">
+                            <i class="ph-bold ph-lightning"></i>
+                            Spécification fonctionnelle :
+                        </div>
+                        <p>
+                            Le signal de sortie <code class="font-mono text-emerald-300">z</code> doit être assigné à la valeur d'une <strong>porte XOR (OU Exclusif) à 3 entrées</strong> (<code class="font-mono text-pixel-cyan">x0</code>, <code class="font-mono text-pixel-cyan">x1</code> et <code class="font-mono text-pixel-cyan">x2</code>).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Explication Mathématique & Parité Impaire avec Barres -->
+                <div class="lg:col-span-6 glass-card rounded-2xl p-6 space-y-4">
+                    <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                        <i class="ph-fill ph-math-operations text-pixel-cyan"></i>
+                        2. Mon Analyse Logique &amp; Équations avec Barre
+                    </h3>
+
+                    <div class="space-y-3 text-xs sm:text-sm text-slate-300">
+                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
+                            <div class="font-bold text-pixel-cyan font-mono">A. Associativité de l'opérateur OU Exclusif (⊕)</div>
+                            <p class="leading-relaxed">
+                                Comme l'opérateur <code class="font-mono text-purple-300">xor</code> est associatif, une porte XOR à 3 entrées équivaut à mettre <strong>deux portes XOR à 2 entrées en cascade</strong> :
+                            </p>
+                            <div class="py-1.5 px-3 rounded bg-slate-950 font-mono text-xs text-amber-300 border border-slate-800 text-center">
+                                Z = x<sub>0</sub> ⊕ x<sub>1</sub> ⊕ x<sub>2</sub> = (x<sub>0</sub> ⊕ x<sub>1</sub>) ⊕ x<sub>2</sub>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
+                            <div class="font-bold text-purple-300 font-mono">B. Fonction de Détecteur de Parité Impaire</div>
+                            <p class="leading-relaxed">
+                                En dressant la table de vérité à 8 lignes, j'ai vérifié un point important : la sortie <code class="font-mono text-emerald-400">Z</code> vaut <code class="font-mono text-emerald-400">'1'</code> lorsque le <strong>nombre d'entrées égales à '1' est impair</strong> (c'est-à-dire quand <strong>une seule</strong> entrée est à '1', ou quand <strong>les 3 entrées</strong> sont à '1' simultanément car <code class="font-mono text-pixel-cyan">(1 ⊕ 1) ⊕ 1 = 0 ⊕ 1 = 1</code>).
+                            </p>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+                            <div class="font-bold text-emerald-400 font-mono">C. Développement Canonique (Somme des Mintermes avec Barres)</div>
+                            <p class="font-mono text-xs text-slate-200 leading-relaxed">
+                                Z = (<span class="bar">x<sub>0</sub></span> · <span class="bar">x<sub>1</sub></span> · x<sub>2</sub>) + (<span class="bar">x<sub>0</sub></span> · x<sub>1</sub> · <span class="bar">x<sub>2</sub></span>) + (x<sub>0</sub> · <span class="bar">x<sub>1</sub></span> · <span class="bar">x<sub>2</sub></span>) + (x<sub>0</sub> · x<sub>1</sub> · x<sub>2</sub>) = ∑ m(1, 2, 4, 7)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Simulateur Interactif & Cascade XOR + Table de Vérité à 8 lignes -->
+            <div class="glass-card-violet rounded-2xl p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-pixel-violet animate-ping"></span>
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-white">
+                                3. Simulateur Logique : Cascade XOR & Détecteur de Parité Impaire (<code class="font-mono text-purple-300">C2_4</code>)
+                            </h3>
+                            <p class="text-xs text-slate-400">
+                                Basculez les interrupteurs <code class="font-mono text-pixel-cyan">x0</code>, <code class="font-mono text-pixel-cyan">x1</code>, <code class="font-mono text-pixel-cyan">x2</code> ou cliquez directement sur une ligne de la table de vérité pour visualiser la propagation du signal.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="ex7-parity-badge" class="px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 self-start sm:self-center">
+                        Nombre de '1' : 0 (Parité Paire → Z = '0')
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Left: Interactive Switches & SVG Schematic -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <!-- 3 Toggle Buttons -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="toggleEx7Bit(0)" id="btn-ex7-x0" class="p-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-pixel-cyan transition flex items-center justify-between group">
+                                <div class="text-left">
+                                    <div class="text-[11px] font-mono text-slate-400">Entrée MSB</div>
+                                    <div class="font-display font-bold text-base text-white">Signal x0</div>
+                                </div>
+                                <span id="val-ex7-x0" class="w-9 h-9 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold text-base flex items-center justify-center border border-slate-600">'0'</span>
+                            </button>
+
+                            <button onclick="toggleEx7Bit(1)" id="btn-ex7-x1" class="p-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-pixel-cyan transition flex items-center justify-between group">
+                                <div class="text-left">
+                                    <div class="text-[11px] font-mono text-slate-400">Entrée Milieu</div>
+                                    <div class="font-display font-bold text-base text-white">Signal x1</div>
+                                </div>
+                                <span id="val-ex7-x1" class="w-9 h-9 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold text-base flex items-center justify-center border border-slate-600">'0'</span>
+                            </button>
+
+                            <button onclick="toggleEx7Bit(2)" id="btn-ex7-x2" class="p-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-pixel-cyan transition flex items-center justify-between group">
+                                <div class="text-left">
+                                    <div class="text-[11px] font-mono text-slate-400">Entrée LSB</div>
+                                    <div class="font-display font-bold text-base text-white">Signal x2</div>
+                                </div>
+                                <span id="val-ex7-x2" class="w-9 h-9 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold text-base flex items-center justify-center border border-slate-600">'0'</span>
+                            </button>
+                        </div>
+
+                        <!-- SVG Circuit Diagram: Cascaded 2-input XOR gates forming 3-input XOR -->
+                        <div class="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 flex flex-col items-center">
+                            <div class="w-full flex items-center justify-between text-[11px] font-mono text-slate-400 mb-2 px-2">
+                                <span>Schéma Logique Synthétisé (Cascade XOR)</span>
+                                <span>z &lt;= (x0 xor x1) xor x2;</span>
+                            </div>
+
+                            <svg viewBox="0 0 500 220" class="w-full h-auto max-w-xl">
+                                <!-- Entity boundary dashed box -->
+                                <rect x="85" y="15" width="330" height="190" rx="14" fill="rgba(15, 23, 42, 0.5)" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="5 5" />
+                                <text x="250" y="34" text-anchor="middle" fill="#A142F4" font-family="Space Grotesk" font-size="11" font-weight="bold">ENTITY C2_4 (ARCHITECTURE A2_4)</text>
+
+                                <!-- Input Wires x0, x1, x2 -->
+                                <line id="svg-ex7-w-x0" x1="35" y1="65" x2="135" y2="65" stroke="#334155" stroke-width="3.5" stroke-linecap="round" />
+                                <text x="20" y="69" fill="#00E5FF" font-family="JetBrains Mono" font-size="13" font-weight="bold">x0</text>
+                                <text id="svg-ex7-t-x0" x="62" y="56" fill="#94A3B8" font-family="JetBrains Mono" font-size="11">'0'</text>
+
+                                <line id="svg-ex7-w-x1" x1="35" y1="105" x2="135" y2="105" stroke="#334155" stroke-width="3.5" stroke-linecap="round" />
+                                <text x="20" y="109" fill="#00E5FF" font-family="JetBrains Mono" font-size="13" font-weight="bold">x1</text>
+                                <text id="svg-ex7-t-x1" x="62" y="96" fill="#94A3B8" font-family="JetBrains Mono" font-size="11">'0'</text>
+
+                                <path id="svg-ex7-w-x2" d="M 35 165 L 245 165 L 245 140 L 280 140" fill="none" stroke="#334155" stroke-width="3.5" stroke-linecap="round" />
+                                <text x="20" y="169" fill="#00E5FF" font-family="JetBrains Mono" font-size="13" font-weight="bold">x2</text>
+                                <text id="svg-ex7-t-x2" x="62" y="156" fill="#94A3B8" font-family="JetBrains Mono" font-size="11">'0'</text>
+
+                                <!-- First XOR Gate (x0 xor x1) -->
+                                <path d="M 127 55 Q 142 85 127 115" fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round" />
+                                <path d="M 135 55 C 165 55, 185 65, 200 85 C 185 105, 165 115, 135 115 Q 150 85 135 55 Z" fill="#0F172A" stroke="#00E5FF" stroke-width="2.2" />
+                                <text x="163" y="89" text-anchor="middle" fill="#00E5FF" font-family="JetBrains Mono" font-size="10" font-weight="bold">XOR1</text>
+
+                                <!-- Intermediate Signal s_int = x0 xor x1 -->
+                                <path id="svg-ex7-w-sint" d="M 200 85 L 245 85 L 245 105 L 280 105" fill="none" stroke="#334155" stroke-width="3.5" stroke-linecap="round" />
+                                <text x="235" y="75" text-anchor="middle" fill="#C084FC" font-family="JetBrains Mono" font-size="10">s_int = <tspan id="svg-ex7-t-sint" font-weight="bold">'0'</tspan></text>
+
+                                <!-- Second XOR Gate (s_int xor x2) -->
+                                <path d="M 272 93 Q 287 123 272 153" fill="none" stroke="#A142F4" stroke-width="2.5" stroke-linecap="round" />
+                                <path d="M 280 93 C 310 93, 330 103, 345 123 C 330 143, 310 153, 280 153 Q 295 123 280 93 Z" fill="#0F172A" stroke="#A142F4" stroke-width="2.2" />
+                                <text x="308" y="127" text-anchor="middle" fill="#C084FC" font-family="JetBrains Mono" font-size="10" font-weight="bold">XOR2</text>
+
+                                <!-- Final Output Wire z -->
+                                <line id="svg-ex7-w-z" x1="345" y1="123" x2="440" y2="123" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                                <circle id="svg-ex7-node-z" cx="458" cy="123" r="18" fill="#0F172A" stroke="#475569" stroke-width="2.5" />
+                                <text id="svg-ex7-t-z" x="458" y="128" text-anchor="middle" fill="#94A3B8" font-family="JetBrains Mono" font-size="15" font-weight="bold">'0'</text>
+                                <text x="428" y="108" fill="#E2E8F0" font-family="JetBrains Mono" font-size="13" font-weight="bold">z</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Right: Complete 8-Row Interactive Truth Table -->
+                    <div class="lg:col-span-5">
+                        <div class="rounded-2xl border border-slate-800 overflow-hidden bg-slate-950/80">
+                            <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+                                <span class="font-display font-bold text-xs sm:text-sm text-white">Table de Vérité Complète (2³ = 8 états)</span>
+                                <span class="text-[11px] font-mono text-purple-300">Cliquez une ligne</span>
+                            </div>
+                            <table class="w-full font-mono text-xs text-center">
+                                <thead class="bg-slate-900/70 text-slate-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-2">x0</th>
+                                        <th class="py-2">x1</th>
+                                        <th class="py-2">x2</th>
+                                        <th class="py-2 text-purple-300">x0⊕x1</th>
+                                        <th class="py-2">Nb '1'</th>
+                                        <th class="py-2 text-pixel-cyan">Sortie z</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ex7-tt-body" class="divide-y divide-slate-800/60">
+                                    <!-- Populated dynamically or static interactive rows -->
+                                    <tr id="ex7-row-0" onclick="setEx7State(0,0,0)" class="cursor-pointer bg-pixel-violet/25 text-white font-bold transition">
+                                        <td class="py-2">'0'</td><td class="py-2">'0'</td><td class="py-2">'0'</td>
+                                        <td class="py-2 text-purple-300">'0'</td>
+                                        <td class="py-2 text-[11px] text-slate-400">0 (Pair)</td>
+                                        <td class="py-2 text-slate-400">'0'</td>
+                                    </tr>
+                                    <tr id="ex7-row-1" onclick="setEx7State(0,0,1)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'0'</td><td class="py-2">'0'</td><td class="py-2">'1'</td>
+                                        <td class="py-2 text-purple-300">'0'</td>
+                                        <td class="py-2 text-[11px] text-emerald-400">1 (Impair)</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex7-row-2" onclick="setEx7State(0,1,0)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'0'</td><td class="py-2">'1'</td><td class="py-2">'0'</td>
+                                        <td class="py-2 text-purple-300">'1'</td>
+                                        <td class="py-2 text-[11px] text-emerald-400">1 (Impair)</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex7-row-3" onclick="setEx7State(0,1,1)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'0'</td><td class="py-2">'1'</td><td class="py-2">'1'</td>
+                                        <td class="py-2 text-purple-300">'1'</td>
+                                        <td class="py-2 text-[11px] text-slate-400">2 (Pair)</td>
+                                        <td class="py-2 text-slate-400">'0'</td>
+                                    </tr>
+                                    <tr id="ex7-row-4" onclick="setEx7State(1,0,0)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'1'</td><td class="py-2">'0'</td><td class="py-2">'0'</td>
+                                        <td class="py-2 text-purple-300">'1'</td>
+                                        <td class="py-2 text-[11px] text-emerald-400">1 (Impair)</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                    <tr id="ex7-row-5" onclick="setEx7State(1,0,1)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'1'</td><td class="py-2">'0'</td><td class="py-2">'1'</td>
+                                        <td class="py-2 text-purple-300">'1'</td>
+                                        <td class="py-2 text-[11px] text-slate-400">2 (Pair)</td>
+                                        <td class="py-2 text-slate-400">'0'</td>
+                                    </tr>
+                                    <tr id="ex7-row-6" onclick="setEx7State(1,1,0)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'1'</td><td class="py-2">'1'</td><td class="py-2">'0'</td>
+                                        <td class="py-2 text-purple-300">'0'</td>
+                                        <td class="py-2 text-[11px] text-slate-400">2 (Pair)</td>
+                                        <td class="py-2 text-slate-400">'0'</td>
+                                    </tr>
+                                    <tr id="ex7-row-7" onclick="setEx7State(1,1,1)" class="cursor-pointer hover:bg-slate-900 text-slate-300 transition">
+                                        <td class="py-2">'1'</td><td class="py-2">'1'</td><td class="py-2">'1'</td>
+                                        <td class="py-2 text-purple-300">'0'</td>
+                                        <td class="py-2 text-[11px] text-emerald-400">3 (Impair)</td>
+                                        <td class="py-2 font-bold text-emerald-400">'1'</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Code VHDL Complet & Commenté (Exercice 7) -->
+            <div class="glass-card rounded-2xl overflow-hidden border border-pixel-violet/40 shadow-glow-violet">
+                <!-- Header & Tabs -->
+                <div class="bg-slate-900/95 px-4 sm:px-6 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span class="font-mono text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                            <i class="ph-fill ph-file-code text-purple-400"></i>
+                            C2_4.vhd — Solution VHDL Complète (Exercice 7)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 no-print">
+                        <button onclick="switchEx7Tab('direct')" id="btn-ex7-direct" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-violet text-white transition">
+                            Approche 1 : Directe (Flot de données)
+                        </button>
+                        <button onclick="switchEx7Tab('cascade')" id="btn-ex7-cascade" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                            Approche 2 : Signal Intermédiaire
+                        </button>
+                        <button onclick="copyVHDL('code-ex7-active')" class="px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition">
+                            <i class="ph-bold ph-copy"></i>
+                            <span>Copier</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Approche 1 : Directe (Standard TD) -->
+                <div id="panel-ex7-direct" class="p-5 sm:p-6 bg-[#070B16] overflow-x-auto">
+<pre id="code-ex7-direct" class="font-mono text-xs sm:text-sm leading-relaxed text-slate-200"><span class="vhdl-com">-- ============================================================================</span>
+<span class="vhdl-com">-- USTHB - Faculté de Génie Électrique (Master FGE)</span>
+<span class="vhdl-com">-- TD N°1 : Exercice 7 (Entité C2_4 / Architecture A2_4)</span>
+<span class="vhdl-com">-- Réalisé par : Dahane Ahmed Lamine</span>
+<span class="vhdl-com">-- ============================================================================</span>
+
+<span class="vhdl-com">-- Appel de la bibliothèque IEEE pour utiliser le type std_logic</span>
+<span class="vhdl-kw">library</span> IEEE;
+<span class="vhdl-kw">use</span> IEEE.std_logic_1164.<span class="vhdl-kw">all</span>;
+
+<span class="vhdl-com">-- Déclaration de l'entité C2_4 : 3 entrées (x0, x1, x2) et 1 sortie (z)</span>
+<span class="vhdl-kw">entity</span> <span class="vhdl-ent">C2_4</span> <span class="vhdl-kw">is</span>
+    <span class="vhdl-kw">port</span> (
+        x0, x1, x2 : <span class="vhdl-kw">in</span>  <span class="vhdl-type">std_logic</span>;  <span class="vhdl-com">-- Les 3 entrées de la porte XOR</span>
+        z          : <span class="vhdl-kw">out</span> <span class="vhdl-type">std_logic</span>   <span class="vhdl-com">-- La sortie logique z</span>
+    );
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">C2_4</span>;
+
+<span class="vhdl-com">-- Déclaration de l'architecture A2_4 en description "Flot de données" (concurrente)</span>
+<span class="vhdl-kw">architecture</span> <span class="vhdl-ent">A2_4</span> <span class="vhdl-kw">of</span> <span class="vhdl-ent">C2_4</span> <span class="vhdl-kw">is</span>
+<span class="vhdl-kw">begin</span>
+
+    <span class="vhdl-com">-- Ici je n'ai pas besoin de process car c'est une simple équation combinatoire.</span>
+    <span class="vhdl-com">-- Grâce à l'associativité du OU Exclusif, j'enchaîne directement l'opérateur "xor"</span>
+    <span class="vhdl-com">-- entre les trois entrées x0, x1 et x2.</span>
+    z <span class="vhdl-op">&lt;=</span> x0 <span class="vhdl-op">xor</span> x1 <span class="vhdl-op">xor</span> x2;
+
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">A2_4</span>;</pre>
+                </div>
+
+                <!-- Approche 2 : Cascade avec signal interne -->
+                <div id="panel-ex7-cascade" class="hidden p-5 sm:p-6 bg-[#070B16] overflow-x-auto">
+<pre id="code-ex7-cascade" class="font-mono text-xs sm:text-sm leading-relaxed text-slate-200"><span class="vhdl-com">-- ============================================================================</span>
+<span class="vhdl-com">-- USTHB - Master FGE | TD N°1 : Exercice 7 (Seconde méthode par décomposition)</span>
+<span class="vhdl-com">-- Réalisé par : Dahane Ahmed Lamine</span>
+<span class="vhdl-com">-- Idée : J'utilise un signal intermédiaire pour représenter le câblage</span>
+<span class="vhdl-com">--        de deux portes XOR à 2 entrées mises en cascade.</span>
+<span class="vhdl-com">-- ============================================================================</span>
+
+<span class="vhdl-kw">library</span> IEEE;
+<span class="vhdl-kw">use</span> IEEE.std_logic_1164.<span class="vhdl-kw">all</span>;
+
+<span class="vhdl-kw">entity</span> <span class="vhdl-ent">C2_4</span> <span class="vhdl-kw">is</span>
+    <span class="vhdl-kw">port</span> (
+        x0, x1, x2 : <span class="vhdl-kw">in</span>  <span class="vhdl-type">std_logic</span>;
+        z          : <span class="vhdl-kw">out</span> <span class="vhdl-type">std_logic</span>
+    );
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">C2_4</span>;
+
+<span class="vhdl-kw">architecture</span> <span class="vhdl-ent">A2_4</span> <span class="vhdl-kw">of</span> <span class="vhdl-ent">C2_4</span> <span class="vhdl-kw">is</span>
+    <span class="vhdl-com">-- Je déclare un signal interne s_int (avant le begin) pour relier</span>
+    <span class="vhdl-com">-- la sortie de la première porte XOR à l'entrée de la seconde.</span>
+    <span class="vhdl-kw">signal</span> s_int : <span class="vhdl-type">std_logic</span>;
+<span class="vhdl-kw">begin</span>
+
+    <span class="vhdl-com">-- 1ère porte XOR : calcul de x0 xor x1</span>
+    s_int <span class="vhdl-op">&lt;=</span> x0 <span class="vhdl-op">xor</span> x1;
+
+    <span class="vhdl-com">-- 2ème porte XOR : calcul du résultat précédent avec la 3ème entrée x2</span>
+    z     <span class="vhdl-op">&lt;=</span> s_int <span class="vhdl-op">xor</span> x2;
+
+<span class="vhdl-kw">end</span> <span class="vhdl-ent">A2_4</span>;</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             SYNTHÈSE COMPARATIVE : RÉCAPITULATIF POUR L'EXAMEN / TD
+        ====================================================================== -->
+        <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pixel-blue to-pixel-violet flex items-center justify-center text-white">
+                    <i class="ph-bold ph-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-xl text-white">Synthèse Comparative (Fiche Révision TD 1)</h3>
+                    <p class="text-xs text-slate-400">Différences essentielles entre les exercices 6 et 7 à retenir pour les examens VHDL</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-800">
+                <table class="w-full text-left text-xs sm:text-sm">
+                    <thead class="bg-slate-900/95 font-mono text-xs uppercase text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="py-3 px-4">Critère VHDL</th>
+                            <th class="py-3 px-4 text-pixel-cyan">Exercice 6 (Entité C2_3)</th>
+                            <th class="py-3 px-4 text-purple-300">Exercice 7 (Entité C2_4)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/80 bg-slate-950/50">
+                        <tr>
+                            <td class="py-3 px-4 font-semibold text-white">Style de description</td>
+                            <td class="py-3 px-4 text-slate-300">Comportemental séquentiel (<code class="font-mono text-purple-300">process</code> + <code class="font-mono text-purple-300">case ... when</code>)</td>
+                            <td class="py-3 px-4 text-slate-300">Flot de données concurrent (<code class="font-mono text-pixel-cyan">z &lt;= x0 xor x1 xor x2;</code>)</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold text-white">Nécessite un <code class="font-mono">process</code> ?</td>
+                            <td class="py-3 px-4 text-emerald-400 font-medium">Oui, obligatoire car <code class="font-mono">case</code> est une instruction séquentielle</td>
+                            <td class="py-3 px-4 text-slate-400">Non, l'assignation logique s'écrit directement dans l'architecture</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold text-white">Gestion des états non binaires (<code class="font-mono">'U','Z','X'</code>)</td>
+                            <td class="py-3 px-4 text-slate-300">Forcés explicitement à <code class="font-mono text-rose-400">'0'</code> via <code class="font-mono text-purple-300">when others =&gt; z &lt;= '0';</code></td>
+                            <td class="py-3 px-4 text-slate-300">Gérés nativement par la table de résolution de l'opérateur <code class="font-mono text-pixel-cyan">xor</code> de <code class="font-mono">std_logic_1164</code></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-semibold text-white">Équation logique (Notation avec barre)</td>
+                            <td class="py-3 px-4 font-mono text-pixel-cyan">Z = x<sub>0</sub> + <span class="bar">x<sub>1</sub></span></td>
+                            <td class="py-3 px-4 font-mono text-purple-300">Z = x<sub>0</sub> ⊕ x<sub>1</sub> ⊕ x<sub>2</sub> = (<span class="bar">x<sub>0</sub></span>·<span class="bar">x<sub>1</sub></span>·x<sub>2</sub>) + (<span class="bar">x<sub>0</sub></span>·x<sub>1</sub>·<span class="bar">x<sub>2</sub></span>) + (x<sub>0</sub>·<span class="bar">x<sub>1</sub></span>·<span class="bar">x<sub>2</sub></span>) + (x<sub>0</sub>·x<sub>1</sub>·x<sub>2</sub>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="pt-6 pb-12 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-mono">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-pixel-cyan"></span>
+                <span>USTHB • Faculté de Génie Électrique (Master FGE) — Réalisé par <strong class="text-white">Dahane Ahmed Lamine</strong></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>TD N°1 : Logique Combinatoire &amp; VHDL</span>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Toast Notification for Copy -->
+    <div id="copy-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-slate-900/95 border border-emerald-500/50 text-emerald-300 shadow-glow-cyan flex items-center gap-2.5 font-mono text-xs">
+        <i class="ph-fill ph-check-circle text-lg text-emerald-400"></i>
+        <span id="copy-toast-msg">Code VHDL copié dans le presse-papiers !</span>
+    </div>
+
+    <!-- =========================================================================
+         JAVASCRIPT : SIMULATEURS LOGIQUES, TABS, CLIPBOARD & STARFIELD
+    ========================================================================== -->
+    <script>
+        /* ---------------------------------------------------------------------
+           1. EXERCICE 6 — SIMULATEUR C2_3 (9-Valued IEEE 1164 Logic)
+        --------------------------------------------------------------------- */
+        let ex6State = { x0: '0', x1: '0' };
+        let currentEx6Tab = 'explicit';
+
+        const stdLogicNames = {
+            '0': "Niveau Bas Forcé ('0')",
+            '1': "Niveau Haut Forcé ('1')",
+            'U': "Non Initialisé ('U')",
+            'Z': "Haute Impédance ('Z')",
+            'X': "Inconnu Forcé ('X')"
+        };
+
+        function setEx6Input(newX0, newX1) {
+            if (newX0 !== null) ex6State.x0 = newX0;
+            if (newX1 !== null) ex6State.x1 = newX1;
+
+            const { x0, x1 } = ex6State;
+            const sel = x0 + x1;
+
+            // Update button active styles for X0
+            document.querySelectorAll('.ex6-x0-btn').forEach(btn => {
+                const v = btn.getAttribute('data-val');
+                if (v === x0) {
+                    btn.className = "ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-pixel-blue text-white border-pixel-cyan shadow-glow-blue";
+                } else {
+                    const isMeta = (v === 'U' || v === 'Z' || v === 'X');
+                    btn.className = `ex6-x0-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 ${isMeta ? 'text-amber-400' : 'text-slate-300'} border-slate-700 hover:border-pixel-blue`;
+                }
+            });
+
+            // Update button active styles for X1
+            document.querySelectorAll('.ex6-x1-btn').forEach(btn => {
+                const v = btn.getAttribute('data-val');
+                if (v === x1) {
+                    btn.className = "ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-pixel-blue text-white border-pixel-cyan shadow-glow-blue";
+                } else {
+                    const isMeta = (v === 'U' || v === 'Z' || v === 'X');
+                    btn.className = `ex6-x1-btn py-2 rounded-lg font-mono text-xs font-bold border transition bg-slate-800 ${isMeta ? 'text-amber-400' : 'text-slate-300'} border-slate-700 hover:border-pixel-blue`;
+                }
+            });
+
+            // Descriptions
+            document.getElementById('ex6-x0-desc').textContent = stdLogicNames[x0];
+            document.getElementById('ex6-x1-desc').textContent = stdLogicNames[x1];
+            document.getElementById('ex6-sel-badge').textContent = sel;
+
+            // Evaluate output z according to C2_3 case statement
+            let z = '0';
+            let activeBranch = 'others';
+            let branchTitle = '';
+            let branchExplain = '';
+
+            if (sel === '00') {
+                z = '1';
+                activeBranch = '00';
+                branchTitle = 'Branche active : when "00" => z <= \'1\';';
+                branchExplain = 'Entrées x0=\'0\' et x1=\'0\'. Le vecteur "00" active la 1ère branche : la sortie z vaut \'1\'.';
+            } else if (sel === '01') {
+                z = '0';
+                activeBranch = '01';
+                branchTitle = 'Branche active : when "01" => z <= \'0\';';
+                branchExplain = 'Entrées x0=\'0\' et x1=\'1\'. C\'est le seul cas binaire de la table où la sortie z vaut \'0\'.';
+            } else if (sel === '10') {
+                z = '1';
+                activeBranch = '10';
+                branchTitle = 'Branche active : when "10" => z <= \'1\';';
+                branchExplain = 'Entrées x0=\'1\' et x1=\'0\'. Le vecteur "10" active la 3ème branche : la sortie z vaut \'1\'.';
+            } else if (sel === '11') {
+                z = '1';
+                activeBranch = '11';
+                branchTitle = 'Branche active : when "11" => z <= \'1\';';
+                branchExplain = 'Entrées x0=\'1\' et x1=\'1\'. Le vecteur "11" active la 4ème branche : la sortie z vaut \'1\'.';
+            } else {
+                z = '0';
+                activeBranch = 'others';
+                branchTitle = `Branche active : when others => z <= '0'; (sel = "${sel}")`;
+                branchExplain = `État non spécifié détecté ('${x0}' & '${x1}'). Grâce à la clause "when others", la sortie z est forcée en sécurité à '0'.`;
+            }
+
+            // Update Status Box
+            const statusBox = document.getElementById('ex6-status-box');
+            const titleEl = document.getElementById('ex6-branch-title');
+            const explainEl = document.getElementById('ex6-branch-explain');
+            titleEl.textContent = branchTitle;
+            explainEl.textContent = branchExplain;
+
+            if (z === '1') {
+                statusBox.className = "p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs font-mono space-y-1";
+                titleEl.className = "text-emerald-300 font-bold flex items-center gap-1.5";
+            } else if (activeBranch === 'others') {
+                statusBox.className = "p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono space-y-1";
+                titleEl.className = "text-amber-300 font-bold flex items-center gap-1.5";
+            } else {
+                statusBox.className = "p-4 rounded-xl bg-rose-950/30 border border-rose-500/40 text-xs font-mono space-y-1";
+                titleEl.className = "text-rose-300 font-bold flex items-center gap-1.5";
+            }
+
+            // Update SVG Diagram for Exercise 6
+            document.getElementById('svg-ex6-txt-x0').textContent = `'${x0}'`;
+            document.getElementById('svg-ex6-txt-x1').textContent = `'${x1}'`;
+            document.getElementById('svg-ex6-txt-z').textContent = `'${z}'`;
+
+            const wireX0 = document.getElementById('svg-ex6-wire-x0');
+            const wireX1 = document.getElementById('svg-ex6-wire-x1');
+            const wireZ = document.getElementById('svg-ex6-wire-z');
+            const nodeZ = document.getElementById('svg-ex6-node-z');
+            const txtZ = document.getElementById('svg-ex6-txt-z');
+
+            wireX0.setAttribute('stroke', x0 === '1' ? '#00E5FF' : (x0 === '0' ? '#4285F4' : '#F59E0B'));
+            wireX1.setAttribute('stroke', x1 === '1' ? '#00E5FF' : (x1 === '0' ? '#4285F4' : '#F59E0B'));
+
+            if (z === '1') {
+                wireZ.setAttribute('stroke', '#00E5FF');
+                wireZ.classList.add('wire-active');
+                nodeZ.setAttribute('fill', '#064E3B');
+                nodeZ.setAttribute('stroke', '#10B981');
+                txtZ.setAttribute('fill', '#34D399');
+            } else {
+                wireZ.setAttribute('stroke', '#F43F5E');
+                wireZ.classList.remove('wire-active');
+                nodeZ.setAttribute('fill', '#4C0519');
+                nodeZ.setAttribute('stroke', '#F43F5E');
+                txtZ.setAttribute('fill', '#FDA4AF');
+            }
+
+            // Highlight active line inside SVG case box & mini table
+            const branches = ['00', '01', '10', '11', 'others'];
+            branches.forEach(b => {
+                const svgTxt = document.getElementById(`svg-ex6-case-${b}`);
+                const rowEl = document.getElementById(`ex6-row-${b}`);
+                const baseLabel = b === 'others' ? `others => z <= '0'` : `"${b}" => z <= '${b === '01' ? '0' : '1'}'`;
+
+                if (b === activeBranch) {
+                    svgTxt.textContent = `> ${baseLabel}`;
+                    svgTxt.setAttribute('fill', z === '1' ? '#34D399' : '#FB7185');
+                    svgTxt.setAttribute('font-weight', 'bold');
+                    if (rowEl) rowEl.className = "cursor-pointer bg-pixel-blue/25 text-white font-bold transition";
+                } else {
+                    svgTxt.textContent = `  ${baseLabel}`;
+                    svgTxt.setAttribute('fill', '#64748B');
+                    svgTxt.setAttribute('font-weight', 'normal');
+                    if (rowEl) rowEl.className = "cursor-pointer hover:bg-slate-900 text-slate-400 transition";
+                }
+            });
+        }
+
+        function switchEx6Tab(tab) {
+            currentEx6Tab = tab;
+            const pExplicit = document.getElementById('panel-ex6-explicit');
+            const pCompact = document.getElementById('panel-ex6-compact');
+            const bExplicit = document.getElementById('btn-ex6-explicit');
+            const bCompact = document.getElementById('btn-ex6-compact');
+
+            if (tab === 'explicit') {
+                pExplicit.classList.remove('hidden');
+                pCompact.classList.add('hidden');
+                bExplicit.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-blue text-white transition";
+                bCompact.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            } else {
+                pExplicit.classList.add('hidden');
+                pCompact.classList.remove('hidden');
+                bCompact.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-blue text-white transition";
+                bExplicit.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            }
+        }
+
+        /* ---------------------------------------------------------------------
+           2. EXERCICE 7 — SIMULATEUR C2_4 (Porte XOR à 3 entrées)
+        --------------------------------------------------------------------- */
+        let ex7Bits = [0, 0, 0];
+        let currentEx7Tab = 'direct';
+
+        function toggleEx7Bit(index) {
+            ex7Bits[index] = ex7Bits[index] === 0 ? 1 : 0;
+            updateEx7Simulator();
+        }
+
+        function setEx7State(b0, b1, b2) {
+            ex7Bits = [b0, b1, b2];
+            updateEx7Simulator();
+        }
+
+        function updateEx7Simulator() {
+            const [x0, x1, x2] = ex7Bits;
+            const sInt = x0 ^ x1;
+            const z = sInt ^ x2;
+            const onesCount = x0 + x1 + x2;
+            const rowIndex = (x0 << 2) | (x1 << 1) | x2;
+
+            // Update 3 Switch Buttons
+            [0, 1, 2].forEach(i => {
+                const bit = ex7Bits[i];
+                const btn = document.getElementById(`btn-ex7-x${i}`);
+                const badge = document.getElementById(`val-ex7-x${i}`);
+                if (bit === 1) {
+                    btn.className = "p-3.5 rounded-xl bg-pixel-blue/20 border border-pixel-cyan shadow-glow-cyan transition flex items-center justify-between";
+                    badge.className = "w-9 h-9 rounded-lg bg-pixel-cyan text-slate-950 font-mono font-bold text-base flex items-center justify-center";
+                    badge.textContent = "'1'";
+                } else {
+                    btn.className = "p-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-pixel-cyan transition flex items-center justify-between";
+                    badge.className = "w-9 h-9 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold text-base flex items-center justify-center border border-slate-600";
+                    badge.textContent = "'0'";
+                }
+            });
+
+            // Update Parity Badge
+            const parityBadge = document.getElementById('ex7-parity-badge');
+            if (z === 1) {
+                parityBadge.className = "px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 self-start sm:self-center";
+                parityBadge.textContent = `Nombre de '1' : ${onesCount} (Parité IMPAIRE → Z = '1')`;
+            } else {
+                parityBadge.className = "px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 self-start sm:self-center";
+                parityBadge.textContent = `Nombre de '1' : ${onesCount} (Parité Paire → Z = '0')`;
+            }
+
+            // Update SVG Wires & Labels
+            document.getElementById('svg-ex7-t-x0').textContent = `'${x0}'`;
+            document.getElementById('svg-ex7-t-x1').textContent = `'${x1}'`;
+            document.getElementById('svg-ex7-t-x2').textContent = `'${x2}'`;
+            document.getElementById('svg-ex7-t-sint').textContent = `'${sInt}'`;
+            document.getElementById('svg-ex7-t-z').textContent = `'${z}'`;
+
+            const setWireStyle = (id, active, colorActive) => {
+                const el = document.getElementById(id);
+                if (active) {
+                    el.setAttribute('stroke', colorActive);
+                    el.classList.add('wire-active');
+                } else {
+                    el.setAttribute('stroke', '#334155');
+                    el.classList.remove('wire-active');
+                }
+            };
+
+            setWireStyle('svg-ex7-w-x0', x0 === 1, '#00E5FF');
+            setWireStyle('svg-ex7-w-x1', x1 === 1, '#00E5FF');
+            setWireStyle('svg-ex7-w-x2', x2 === 1, '#00E5FF');
+            setWireStyle('svg-ex7-w-sint', sInt === 1, '#C084FC');
+            setWireStyle('svg-ex7-w-z', z === 1, '#10B981');
+
+            const nodeZ = document.getElementById('svg-ex7-node-z');
+            const txtZ = document.getElementById('svg-ex7-t-z');
+            if (z === 1) {
+                nodeZ.setAttribute('fill', '#064E3B');
+                nodeZ.setAttribute('stroke', '#10B981');
+                txtZ.setAttribute('fill', '#34D399');
+            } else {
+                nodeZ.setAttribute('fill', '#0F172A');
+                nodeZ.setAttribute('stroke', '#475569');
+                txtZ.setAttribute('fill', '#94A3B8');
+            }
+
+            // Highlight active row in 8-row Truth Table
+            for (let r = 0; r < 8; r++) {
+                const rowEl = document.getElementById(`ex7-row-${r}`);
+                if (r === rowIndex) {
+                    rowEl.className = "cursor-pointer bg-pixel-violet/30 text-white font-bold transition";
+                } else {
+                    rowEl.className = "cursor-pointer hover:bg-slate-900 text-slate-300 transition";
+                }
+            }
+        }
+
+        function switchEx7Tab(tab) {
+            currentEx7Tab = tab;
+            const pDirect = document.getElementById('panel-ex7-direct');
+            const pCascade = document.getElementById('panel-ex7-cascade');
+            const bDirect = document.getElementById('btn-ex7-direct');
+            const bCascade = document.getElementById('btn-ex7-cascade');
+
+            if (tab === 'direct') {
+                pDirect.classList.remove('hidden');
+                pCascade.classList.add('hidden');
+                bDirect.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-violet text-white transition";
+                bCascade.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            } else {
+                pDirect.classList.add('hidden');
+                pCascade.classList.remove('hidden');
+                bCascade.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-pixel-violet text-white transition";
+                bDirect.className = "px-3 py-1.5 rounded-lg font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            }
+        }
+
+        /* ---------------------------------------------------------------------
+           3. COPY TO CLIPBOARD HELPER (IFRAME SAFE)
+        --------------------------------------------------------------------- */
+        function copyVHDL(target) {
+            let elementId = '';
+            if (target === 'code-ex6-active') {
+                elementId = currentEx6Tab === 'explicit' ? 'code-ex6-explicit' : 'code-ex6-compact';
+            } else if (target === 'code-ex7-active') {
+                elementId = currentEx7Tab === 'direct' ? 'code-ex7-direct' : 'code-ex7-cascade';
+            }
+
+            const codeEl = document.getElementById(elementId);
+            if (!codeEl) return;
+
+            const rawText = codeEl.innerText || codeEl.textContent;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = rawText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            // Show Toast
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2600);
+        }
+
+        /* ---------------------------------------------------------------------
+           4. STARFIELD BACKGROUND ANIMATION (PIXEL SPACE THEME)
+        --------------------------------------------------------------------- */
+        function initStarfield() {
+            const canvas = document.getElementById('starfield');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                stars = [];
+                const count = Math.floor((canvas.width * canvas.height) / 14000);
+                for (let i = 0; i < count; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: Math.random() > 0.8 ? 2 : 1.2,
+                        alpha: Math.random() * 0.7 + 0.2,
+                        speed: Math.random() * 0.015 + 0.005,
+                        color: Math.random() > 0.6 ? '#4285F4' : (Math.random() > 0.5 ? '#00E5FF' : '#A142F4')
+                    });
+                }
+            }
+
+            function animateStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let s of stars) {
+                    s.alpha += s.speed;
+                    if (s.alpha > 0.9 || s.alpha < 0.15) s.speed = -s.speed;
+                    ctx.fillStyle = s.color;
+                    ctx.globalAlpha = Math.max(0.1, Math.min(0.9, s.alpha));
+                    ctx.fillRect(s.x, s.y, s.size, s.size);
+                }
+                requestAnimationFrame(animateStars);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            animateStars();
+        }
+
+        window.onload = function () {
+            initStarfield();
+            setEx6Input('0', '0');
+            setEx7State(0, 0, 0);
+        };
+    </script>
+</body>
+</html>
